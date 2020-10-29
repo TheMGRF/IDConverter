@@ -18,7 +18,7 @@ package de.themoep.idconverter;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -35,11 +35,11 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class IdConverter {
-    
+
     private static Properties p = new Properties();
-    
+
     public static void main(String[] args) {
-        
+
         try {
             InputStream s = IdConverter.class.getClassLoader().getResourceAsStream("app.properties");
             p.load(s);
@@ -47,10 +47,10 @@ public class IdConverter {
             e.printStackTrace();
             return;
         }
-    
+
         if (System.console() == null && !GraphicsEnvironment.isHeadless()) {
             new Gui(p.getProperty("application.name") + " v" + p.getProperty("application.version")).setVisible(true);
-        } else if (!run(args)){
+        } else if (!run(args)) {
             System.out.print("Usage: " + p.getProperty("application.name") + ".jar <file/folder name>\n" +
                     " -rf,--replace-from        The type of ID to replace from. Possible values: numeric, legacy (pre 1.13), flattening (Default: numeric)\n" +
                     " -rt,--replace-to          The type of ID to replace to. Possible values: numeric, legacy (pre 1.13), flattening (Default: flattening)\n" +
@@ -61,21 +61,21 @@ public class IdConverter {
                     "All parameters are optional\n");
         }
     }
-    
+
     private static boolean run(String[] args) {
         if (args.length == 0) {
             return false;
         }
         String path = args[0];
-    
+
         String regex = null;
         boolean lowercase = true;
         int maxDepth = 1;
         String fileRegex = "\\w+\\.yml";
-    
+
         IdMappings.IdType replaceFrom = IdMappings.IdType.NUMERIC;
         IdMappings.IdType replaceTo = IdMappings.IdType.FLATTENING;
-        
+
         String par = "";
         int i = 0;
         while (i + 2 < args.length) {
@@ -85,11 +85,11 @@ public class IdConverter {
                 start = 1;
             } else if (args[i].startsWith("--")) {
                 start = 2;
-            } else if (par.isEmpty()){
+            } else if (par.isEmpty()) {
                 System.out.print("Wrong parameter " + args[i] + "!\n");
                 return false;
             }
-            
+
             par = args[i].substring(start);
             i++;
             String value = args[i];
@@ -109,7 +109,7 @@ public class IdConverter {
                     value = value.substring(1, value.length() - 1);
                 }
             }
-            
+
             if ("r".equals(par) || "regex".equalsIgnoreCase(par)) {
                 regex = value;
             } else if ("d".equals(par) || "depth".equalsIgnoreCase(par)) {
@@ -142,31 +142,32 @@ public class IdConverter {
                 }
             }
         }
-        
+
         if (regex == null) {
             regex = replaceFrom.getRegex();
         }
-        
+
         ReturnState r = replace(Collections.singletonList(Paths.get(path)), maxDepth, fileRegex, replaceFrom, replaceTo, regex, lowercase);
         if (r.getType() == ReturnType.SUCCESS) {
             System.out.print("Successfully replaced IDs in file(s) with Material names!\n");
         } else if (r.getMessage().isPresent()) {
-            System.out.print(r.getType().toHuman() +": " + r.getMessage().get() + "\n");
+            System.out.print(r.getType().toHuman() + ": " + r.getMessage().get() + "\n");
         } else {
             System.out.print(r.getType().toHuman() + "!" + "\n");
         }
         return true;
     }
-    
+
     /**
      * Replace the ids in a certain path that match a regex
-     * @param paths             The paths to match
-     * @param maxDepth          Maximum amount of sub folders that are searched though
-     * @param fileRegexString   The regex that the file names have to match
-     * @param replaceFrom       Which type of id do we want to replace from
-     * @param replaceTo         Which type of id do we want to replace to
-     * @param regexString       The regex to match
-     * @param lowercase         Whether the material name should be lowercase
+     *
+     * @param paths           The paths to match
+     * @param maxDepth        Maximum amount of sub folders that are searched though
+     * @param fileRegexString The regex that the file names have to match
+     * @param replaceFrom     Which type of id do we want to replace from
+     * @param replaceTo       Which type of id do we want to replace to
+     * @param regexString     The regex to match
+     * @param lowercase       Whether the material name should be lowercase
      * @return The return state
      */
     public static ReturnState replace(List<Path> paths, int maxDepth, String fileRegexString, IdMappings.IdType replaceFrom, IdMappings.IdType replaceTo, String regexString, boolean lowercase) {
@@ -184,7 +185,7 @@ public class IdConverter {
         } catch (PatternSyntaxException e) {
             return new ReturnState(ReturnType.INVALID_REGEX, e.getMessage());
         }
-        
+
         for (Path path : paths) {
             if (Files.isRegularFile(path)) {
                 return replaceInFile(path, replaceFrom, replaceTo, regex, lowercase);
@@ -194,7 +195,7 @@ public class IdConverter {
         }
         return new ReturnState(ReturnType.SUCCESS);
     }
-    
+
     private static ReturnState replaceInFile(Path path, IdMappings.IdType replaceFrom, IdMappings.IdType replaceTo, Pattern regex, boolean lowercase) {
         Charset charset = StandardCharsets.UTF_8;
         try {
@@ -204,9 +205,9 @@ public class IdConverter {
             while (matcher.find()) {
                 try {
                     String idStr = matcher.group(2);
-                    
+
                     IdMappings.Mapping mat = IdMappings.get(replaceFrom, idStr);
-                    
+
                     String matString = null;
                     if (mat != null) {
                         matString = mat.get(replaceTo);
@@ -233,21 +234,21 @@ public class IdConverter {
                     return new ReturnState(ReturnType.INVALID_REGEX, "The first group in the regex matched a non-numeric character! (The ID must be the second group!)");
                 }
             }
-            
+
             Files.write(path, content.getBytes(charset));
         } catch (IOException e) {
             return new ReturnState(ReturnType.UNKNOWN_ERROR, e.getMessage());
         }
         return new ReturnState(ReturnType.SUCCESS);
     }
-    
+
     private static ReturnState replaceInDirectory(Path path, IdMappings.IdType replaceFrom, IdMappings.IdType replaceTo, Pattern fileRegex, int depth, int maxDepth, Pattern regex, boolean lowercase) {
         ReturnState r = new ReturnState(ReturnType.SUCCESS);
         try {
-            
+
             Files.list(path).forEach(p -> {
                 ReturnState rs = new ReturnState();
-                
+
                 if (!Files.exists(p)) {
                     rs = new ReturnState(ReturnType.MISSING_FILE, p.toString());
                 } else if (!Files.isWritable(p)) {
