@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class IdMappings {
+
     public static final Mapping[] MAPPINGS = {
             new Mapping(0, "air"),
             new Mapping(1, "stone"),
@@ -822,12 +823,12 @@ public class IdMappings {
             new Mapping(2266, "record_11", "music_disc_11"),
             new Mapping(2267, "record_12", "music_disc_wait")
     };
-    
+
     private final static Map<String, Mapping> BY_NUMERIC_ID = new HashMap<>();
     private final static Map<String, Mapping> BY_LEGACY_NAME = new HashMap<>();
     private final static Map<String, Mapping> BY_FLATTENING_NAME = new HashMap<>();
     private static final String INTERNAL_DELIMITER = ":";
-    
+
     static {
         for (Mapping mapping : MAPPINGS) {
             if (mapping.getNumericId() >= 0) {
@@ -847,7 +848,7 @@ public class IdMappings {
             }
         }
     }
-    
+
     public static Mapping get(IdType type, String id, String delimiter) {
         if (delimiter != null) {
             Mapping mapping = get(type, id.replace(delimiter, INTERNAL_DELIMITER));
@@ -857,7 +858,7 @@ public class IdMappings {
         }
         return get(type, id);
     }
-    
+
     public static Mapping get(IdType type, String id) {
         switch (type) {
             case NUMERIC:
@@ -870,75 +871,75 @@ public class IdMappings {
                 throw new IllegalArgumentException(type + " is not a valid map type.");
         }
     }
-    
+
     public static Mapping getById(String id) {
         return BY_NUMERIC_ID.get(id.toUpperCase(Locale.ENGLISH));
     }
-    
+
     public static Mapping getByLegacyType(String oldType) {
         return BY_LEGACY_NAME.get(oldType.toUpperCase(Locale.ENGLISH));
     }
-    
+
     public static Mapping getByFlatteningType(String flatteningType) {
         return BY_FLATTENING_NAME.get(flatteningType.toUpperCase(Locale.ENGLISH));
     }
-    
+
     public static class Mapping {
         private final String flatteningType;
         private final String legacyType;
         private final int numericId;
         private final int data;
         private Note note = null;
-    
+
         public Mapping(int numericId, int data, String legacyType, String flatteningType) {
             this.flatteningType = flatteningType != null ? flatteningType.toUpperCase(Locale.ENGLISH) : null;
             this.legacyType = legacyType != null ? legacyType.toUpperCase(Locale.ENGLISH) : null;
             this.numericId = numericId;
             this.data = data;
         }
-    
+
         public Mapping(int numericId, String legacyType, String flatteningType) {
             this(numericId, 0, legacyType, flatteningType);
         }
-        
+
         public Mapping(int numericId, int data, String type) {
             this(numericId, data, type, type);
         }
-    
+
         public Mapping(int numericId, String type) {
             this(numericId, 0, type);
         }
-    
+
         public Mapping(int numericId, String oldType, Note note) {
             this(numericId, oldType, (String) null);
             this.note = note;
         }
-    
+
         public Mapping(int numericId, int data, String oldType, Note note) {
             this(numericId, data, oldType, (String) null);
             this.note = note;
         }
-    
+
         public String getFlatteningType() {
             return flatteningType;
         }
-    
+
         public String getLegacyType() {
             return legacyType;
         }
-    
+
         public int getNumericId() {
             return numericId;
         }
-    
+
         public int getData() {
             return data;
         }
-    
+
         public String get(IdType type) {
             return get(type, null);
         }
-        
+
         public String get(IdType type, String delimiter) {
             switch (type) {
                 case NUMERIC:
@@ -960,35 +961,35 @@ public class IdMappings {
                     throw new IllegalArgumentException(type + " is not a valid value.");
             }
         }
-    
+
         public Note getNote() {
             return note;
         }
     }
-    
+
     public enum IdType {
         NUMERIC("(\\W*: )(\\d+(:\\d+|))(\\W*)"),
         LEGACY("(\\W*: )(\\w+(:\\d+|))(\\W*)"),
         FLATTENING("(\\W*: )(\\w+)(\\W*)");
-    
+
         private final String regex;
-    
+
         IdType(String regex) {
             this.regex = regex;
         }
-    
+
         public String getRegex() {
             return regex;
         }
     }
-    
+
     public static class Note {
         private final String text;
-    
+
         public Note(String text) {
             this.text = text;
         }
-    
+
         public String getText() {
             return text;
         }

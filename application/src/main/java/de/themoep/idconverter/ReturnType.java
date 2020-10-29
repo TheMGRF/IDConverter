@@ -26,7 +26,7 @@ public enum ReturnType {
     INVALID_REGEX,
     INVALID_TYPE_COMBINATION,
     UNKNOWN_ERROR;
-    
+
     public String toHuman() {
         return toString().replace('_', ' ');
     }

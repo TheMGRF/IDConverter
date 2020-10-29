@@ -18,37 +18,26 @@ package de.themoep.idconverter;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-import java.awt.BorderLayout;
-import java.awt.Checkbox;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Gui extends JFrame {
-    
+
     public Gui(String title) {
         super(title);
-    
+
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-        
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
+
         JTextField regexField = new JTextField("", 20);
-        
+
         JPanel replaceTypeLine = new JPanel();
-        
+
         JPanel replaceFromColumn = new JPanel();
         replaceFromColumn.add(new JLabel("Replace from:"));
         JList<IdMappings.IdType> replaceFromList = new JList<>(IdMappings.IdType.values());
@@ -63,34 +52,34 @@ public class Gui extends JFrame {
             }
         });
         replaceFromColumn.add(replaceFromList);
-        
+
         replaceTypeLine.add(replaceFromColumn);
-    
+
         JPanel replaceToColumn = new JPanel();
         replaceToColumn.add(new JLabel("Replace to:"));
         JList<IdMappings.IdType> replaceToList = new JList<>(IdMappings.IdType.values());
         replaceToList.setSelectedValue(IdMappings.IdType.FLATTENING, true);
         replaceToList.setLayout(new BorderLayout(5, 5));
         replaceToColumn.add(replaceToList);
-        
+
         replaceTypeLine.add(replaceToColumn);
-        
+
         getContentPane().add(replaceTypeLine);
-        
+
         JPanel regexLine = new JPanel();
         regexLine.add(new JLabel("ID strings have to match:"));
-    
+
         regexField.setText(replaceFromList.getSelectedValue().getRegex());
         regexLine.add(regexField);
         regexLine.add(new JLabel("(Regex)"));
         getContentPane().add(regexLine);
-    
+
         JPanel lowercaseLine = new JPanel();
         lowercaseLine.add(new JLabel("Should the replaced Material be lowercase in the end?"));
         Checkbox lowercaseBox = new Checkbox(null, true);
         lowercaseLine.add(lowercaseBox, BorderLayout.LINE_START);
         getContentPane().add(lowercaseLine);
-        
+
         JPanel pathLine = new JPanel();
         JTextField pathField = new JTextField(20);
         pathLine.add(pathField);
@@ -117,21 +106,21 @@ public class Gui extends JFrame {
         });
         pathLine.add(buttonSelectPath);
         getContentPane().add(pathLine);
-        
+
         JPanel depthLine = new JPanel();
         depthLine.add(new JLabel("Sub folder depth:"));
         JSpinner maxDepthSpinner = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
         depthLine.add(maxDepthSpinner);
         depthLine.add(new JLabel("(when selecting folder)"));
         getContentPane().add(depthLine);
-        
+
         JPanel fileLine = new JPanel();
         fileLine.add(new JLabel("Replace in files that match:"));
         JTextField fileField = new JTextField("\\w+\\.yml", 20);
         fileLine.add(fileField);
         fileLine.add(new JLabel("(Regex)"));
         getContentPane().add(fileLine);
-    
+
         JPanel convertPanel = new JPanel();
         JButton buttonConvert = new JButton("Convert");
         buttonConvert.addActionListener(e -> {
@@ -146,7 +135,7 @@ public class Gui extends JFrame {
                     s = s.substring(1);
                 }
                 if (s.endsWith("\"")) {
-                    s = s.substring(0, s.length() -1);
+                    s = s.substring(0, s.length() - 1);
                 }
                 return Paths.get(s);
             }).collect(Collectors.toList()), maxDepth, fileRegex, replaceFrom, replaceTo, regex, lowercase);
@@ -160,7 +149,7 @@ public class Gui extends JFrame {
         });
         convertPanel.add(buttonConvert);
         getContentPane().add(convertPanel, BorderLayout.CENTER);
-        
+
         setLocationRelativeTo(null);
         pack();
     }
