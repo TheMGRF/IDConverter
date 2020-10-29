@@ -71,7 +71,7 @@ public class IdConverter {
         String regex = null;
         boolean lowercase = true;
         int maxDepth = 1;
-        String fileRegex = "\\w+\\.yml";
+        String fileRegex = "\\w+\\.txt";
 
         IdMappings.IdType replaceFrom = IdMappings.IdType.NUMERIC;
         IdMappings.IdType replaceTo = IdMappings.IdType.FLATTENING;
@@ -204,7 +204,7 @@ public class IdConverter {
             int offset = 0;
             while (matcher.find()) {
                 try {
-                    String idStr = matcher.group(2);
+                    String idStr = matcher.group(1);
 
                     IdMappings.Mapping mat = IdMappings.get(replaceFrom, idStr);
 
@@ -225,7 +225,7 @@ public class IdConverter {
                     if (lowercase) {
                         matString = matString.toLowerCase(Locale.ENGLISH);
                     }
-                    content = content.substring(0, matcher.start(2) + offset) + matString + content.substring(matcher.end(2) + offset);
+                    content = content.substring(0, matcher.start(1) + offset) + matString + content.substring(matcher.end(1) + offset);
                     offset += matString.length() - idStr.length();
                     //replacements.put(group, matcher.group(1) + matString + matcher.group(3));
                 } catch (IndexOutOfBoundsException e) {
