@@ -968,9 +968,9 @@ public class IdMappings {
     }
 
     public enum IdType {
-        NUMERIC("(\\W*: )(\\d+(:\\d+|))(\\W*)"),
-        LEGACY("(\\W*: )(\\w+(:\\d+|))(\\W*)"),
-        FLATTENING("(\\W*: )(\\w+)(\\W*)");
+        NUMERIC(",(\\d+:(\\d+|))"),
+        LEGACY(",(\\w+(:\\d+|))"),
+        FLATTENING(",(\\w+)(\\W*)");
 
         private final String regex;
 
