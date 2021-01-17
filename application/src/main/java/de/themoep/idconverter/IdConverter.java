@@ -36,22 +36,21 @@ import java.util.regex.PatternSyntaxException;
 
 public class IdConverter {
 
-    private static Properties p = new Properties();
+    private static final Properties PROPERTIES = new Properties();
 
     public static void main(String[] args) {
-
         try {
             InputStream s = IdConverter.class.getClassLoader().getResourceAsStream("app.properties");
-            p.load(s);
+            PROPERTIES.load(s);
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
 
         if (System.console() == null && !GraphicsEnvironment.isHeadless()) {
-            new Gui(p.getProperty("application.name") + " v" + p.getProperty("application.version")).setVisible(true);
+            new Gui(PROPERTIES.getProperty("application.name") + " v" + PROPERTIES.getProperty("application.version")).setVisible(true);
         } else if (!run(args)) {
-            System.out.print("Usage: " + p.getProperty("application.name") + ".jar <file/folder name>\n" +
+            System.out.print("Usage: " + PROPERTIES.getProperty("application.name") + ".jar <file/folder name>\n" +
                     " -rf,--replace-from        The type of ID to replace from. Possible values: numeric, legacy (pre 1.13), flattening (Default: numeric)\n" +
                     " -rt,--replace-to          The type of ID to replace to. Possible values: numeric, legacy (pre 1.13), flattening (Default: flattening)\n" +
                     " -r,--regex <regex>        Regex for matching the ID string. Needs to have 3 groups. (One before, one the ID and the third the stuff after the ID) (Default: depending on replace-from)\n" +
